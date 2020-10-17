@@ -1,4 +1,5 @@
 import speech_recognition as sr
+import client
 from time import ctime
 import playsound
 import os
@@ -6,7 +7,7 @@ import random
 from gtts import gTTS
 import time
 import wikipedia
-
+DISCONNECT_MESSAGE = '!DISCONNECT'
 r = sr.Recognizer()
 
 
@@ -64,8 +65,9 @@ def record_audio(ask=False):
 
 
 def respond(voice_data):
-    print(voice_data)
+
     global trigger
+    global sock_client
     # HELLO - GREETINGS
     if there_exists(['hey Friday', 'hi Friday', 'Friday']) and not trigger:
         greetings = [f"hey, how can I help you {person.name}?", f"hey, what's up? {person.name}",
@@ -140,14 +142,19 @@ def respond(voice_data):
         response = ex[random.randint(0, len(ex) - 1)]
         friday_speak(response)
         trigger = False
+        sock_client.send(DISCONNECT_MESSAGE)
         exit()
 
     # LIGHTS ON
     if there_exists(["turn the lights on", "lights on", "i can't see", "i can not see", "i can't see anything", "world is black for me", "my room is in complete darkness"]) and trigger:
         # turn the lights on
-        lights_on = ["lighting your world up", "turning the lights on", "i hope you can see now",
-                     "you should be able to see now", "can you see me now? hahaha i'm kidding i'm just a robot"]
-        response = lights_on[random.randint(0, len(lights_on) - 1)]
+
+        if sock_client.send('HIGH'):
+            lights_on = ["lighting your world up", "turning the lights on", "i hope you can see now",
+                         "you should be able to see now", "can you see me now? hahaha i'm kidding i'm just a robot"]
+            response = lights_on[random.randint(0, len(lights_on) - 1)]
+        else:
+            response = 'Sorry, I could not do it'
         friday_speak(response)
         trigger = False
 
@@ -180,9 +187,10 @@ def respond(voice_data):
 
 time.sleep(1)
 person = Person()
+sock_client = client.SocketClient()
 trigger = False
 print("Running Assistant")
-while True:
 
+while True:
     voice_data = record_audio()
     respond(voice_data)
