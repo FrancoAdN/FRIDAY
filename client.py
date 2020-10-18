@@ -7,7 +7,7 @@ class SocketClient:
     HEADER = 64
     PORT = 5050
     FORMAT = 'utf-8'
-    SERVER = '192.168.0.14'
+    SERVER = '192.168.0.18'
     ADDR = (SERVER, PORT)
     connected = False
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

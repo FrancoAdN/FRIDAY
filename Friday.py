@@ -160,9 +160,13 @@ def respond(voice_data):
 
     # LIGHTS OFF
     if there_exists(["turn the lights off", "lights off", "i don't wanna see anymore"]) and trigger:
-        lights_off = ["turning your lighs off", "shutting your world down", "lights off",
-                      "embrace the darkness", "certanly you can't see me now", "goodbye lights, you were a good friend"]
-        response = lights_off[random.randint(0, len(lights_off) - 1)]
+
+        if sock_client.send('LOW'):
+            lights_off = ["turning your lighs off", "shutting your world down", "lights off",
+                          "embrace the darkness", "certanly you can't see me now", "goodbye lights, you were a good friend"]
+            response = lights_off[random.randint(0, len(lights_off) - 1)]
+        else:
+            response = 'Sorry, I could not do it'
         friday_speak(response)
         trigger = False
 
